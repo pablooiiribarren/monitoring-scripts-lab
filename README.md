@@ -157,13 +157,13 @@ De esta forma el proyecto se mantiene extensible y alineado con buenas práctica
 Algunas extensiones que podrían formar parte de futuras iteraciones:
 - Exportar métricas para Prometheus (ej. exponiendo un endpoint HTTP con prometheus_client) y visualizarlas en Grafana.
 - Alertas vía Telegram / Slack / email, usando webhooks o SMTP.
-Containerización con Docker:
-- Imagen ligera que ejecute el monitor.
-- Montaje de volúmenes para logs.
-Scheduler interno:
-- Ejecutar la monitorización en bucle con intervalos configurables.
-Integración con systemd:
-- Crear un systemd service y un timer para ejecutar el script.
-Gestión de multi-host:
-- Desplegar agente ligero en varios servidores y enviar métricas a un servidor central.
-- Tests automatizados con pytest y GitHub Actions para CI.
+- Containerización con Docker:
+    - Imagen ligera que ejecute el monitor.
+    - Montaje de volúmenes para logs.
+- Scheduler interno:
+    - Ejecutar la monitorización en bucle con intervalos configurables.
+- Integración con systemd:
+    - Crear un systemd service y un timer para ejecutar el script.
+- Gestión de multi-host:
+    - Desplegar agente ligero en varios servidores y enviar métricas a un servidor central.
+    - Tests automatizados con pytest y GitHub Actions para CI.
