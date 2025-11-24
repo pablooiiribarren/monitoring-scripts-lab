@@ -32,9 +32,9 @@ monitoring-scripts-lab/
 ```
 
 ## 2. Requisitos
-Sistema operativo: Linux (se asume systemd y /proc disponible).
-Python 3.9+.
-Opcional: python3-venv instalado para crear entorno virtual.
+- Sistema operativo: Linux (se asume systemd y /proc disponible).
+- Python 3.9+.
+- Opcional: python3-venv instalado para crear entorno virtual.
 
 ## 3. Instalación
 ```bash
@@ -66,13 +66,13 @@ MONITOR_LOG_LEVEL=INFO
 MONITOR_DISK_PATH=/
 # MONITOR_ALERTS_FILE=/var/log/monitoring_alerts.log
 ```
-MONITOR_SERVICES: lista de servicios gestionados por systemd a monitorizar.
-MONITOR_CPU_THRESHOLD: umbral de alerta sobre el load average a 1 minuto.
-MONITOR_MEM_THRESHOLD: umbral de uso de memoria en %.
-MONITOR_DISK_THRESHOLD: umbral de uso de disco en %.
-MONITOR_DISK_PATH: punto de montaje a monitorizar (ej: /, /data).
-MONITOR_LOG_DIR: carpeta donde se guardan los logs.
-MONITOR_ALERTS_FILE: fichero de alertas (por defecto logs/alerts.log).
+- MONITOR_SERVICES: lista de servicios gestionados por systemd a monitorizar.
+- MONITOR_CPU_THRESHOLD: umbral de alerta sobre el load average a 1 minuto.
+- MONITOR_MEM_THRESHOLD: umbral de uso de memoria en %.
+- MONITOR_DISK_THRESHOLD: umbral de uso de disco en %.
+- MONITOR_DISK_PATH: punto de montaje a monitorizar (ej: /, /data).
+- MONITOR_LOG_DIR: carpeta donde se guardan los logs.
+- MONITOR_ALERTS_FILE: fichero de alertas (por defecto logs/alerts.log).
 
 ## 5. Uso
 ### 5.1 Ejecución del monitor en Python
@@ -80,15 +80,15 @@ MONITOR_ALERTS_FILE: fichero de alertas (por defecto logs/alerts.log).
 # Desde la raíz del proyecto
 python -m app.monitor
 ```
-El script ejecuta una pasada de monitorización:
-Comprueba cada servicio configurado.
-Lee métricas de CPU (load avg), memoria y disco.
-Registra el estado en logs/monitor.log.
-Genera alertas si se superan umbrales o un servicio está caído.
+- El script ejecuta una pasada de monitorización:
+    - Comprueba cada servicio configurado.
+    - Lee métricas de CPU (load avg), memoria y disco.
+    - Registra el estado en logs/monitor.log.
+    - Genera alertas si se superan umbrales o un servicio está caído.
 
 Código de salida:
-0 → sin alertas.
-1 → se ha detectado al menos una alerta o error.
+- 0 → sin alertas.
+- 1 → se ha detectado al menos una alerta o error.
 Ejemplo de uso en cron (ejecutar cada 5 minutos):
 ```bash
 */5 * * * * cd /ruta/a/monitoring-scripts-lab && .venv/bin/python -m app.monitor >> /var/log/monitoring-cron.log 2>&1
@@ -132,17 +132,17 @@ Chequeo rápido de servicios: nginx ssh docker
 
 ## 7. Cómo añadir nuevos checks
 Los checks de sistema viven en app/checks.py. Para añadir un nuevo check:
-1.Crear una nueva función en checks.py, por ejemplo:
+- Crear una nueva función en checks.py, por ejemplo:
 ```bash
 def read_swap_usage_percent() -> float:
     # Leer /proc/meminfo y calcular % de uso de swap
     ...
 ```
-2.Importar la función en app/monitor.py:
+- Importar la función en app/monitor.py:
 ```bash
 from app.checks import read_swap_usage_percent
 ```
-3.Integrar la llamada en run_once() y añadir la lógica de alerta:
+- Integrar la llamada en run_once() y añadir la lógica de alerta:
 ```bash
 swap_usage = read_swap_usage_percent()
 logger.info("Uso de swap: %.2f%%", swap_usage)
@@ -155,15 +155,15 @@ De esta forma el proyecto se mantiene extensible y alineado con buenas práctica
 
 ## 8. Mejoras futuras sugeridas
 Algunas extensiones que podrían formar parte de futuras iteraciones:
-Exportar métricas para Prometheus (ej. exponiendo un endpoint HTTP con prometheus_client) y visualizarlas en Grafana.
-Alertas vía Telegram / Slack / email, usando webhooks o SMTP.
+- Exportar métricas para Prometheus (ej. exponiendo un endpoint HTTP con prometheus_client) y visualizarlas en Grafana.
+- Alertas vía Telegram / Slack / email, usando webhooks o SMTP.
 Containerización con Docker:
-Imagen ligera que ejecute el monitor.
-Montaje de volúmenes para logs.
+- Imagen ligera que ejecute el monitor.
+- Montaje de volúmenes para logs.
 Scheduler interno:
-Ejecutar la monitorización en bucle con intervalos configurables.
+- Ejecutar la monitorización en bucle con intervalos configurables.
 Integración con systemd:
-Crear un systemd service y un timer para ejecutar el script.
+- Crear un systemd service y un timer para ejecutar el script.
 Gestión de multi-host:
-Desplegar agente ligero en varios servidores y enviar métricas a un servidor central.
-Tests automatizados con pytest y GitHub Actions para CI.
+- Desplegar agente ligero en varios servidores y enviar métricas a un servidor central.
+- Tests automatizados con pytest y GitHub Actions para CI.
