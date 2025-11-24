@@ -1,0 +1,16 @@
+# Entornos virtuales
+.venv/
+env/
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Logs y ficheros generados
+logs/
+*.log
+
+# Configuración sensible
+.env
