@@ -100,6 +100,7 @@ python -m app.monitor --loop --interval 10
 Código de salida:
 - 0 → sin alertas.
 - 1 → se ha detectado al menos una alerta o error.
+
 Ejemplo de uso en cron (ejecutar cada 5 minutos):
 ```bash
 */5 * * * * cd /ruta/a/monitoring-scripts-lab && .venv/bin/python -m app.monitor >> /var/log/monitoring-cron.log 2>&1
