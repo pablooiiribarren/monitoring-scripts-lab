@@ -1,5 +1,11 @@
 # monitoring-scripts-lab
 
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)]()
+[![Status](https://img.shields.io/badge/Status-Active-success.svg)]()
+[![Linux](https://img.shields.io/badge/Platform-Linux-orange.svg)]()
+[![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)]()
+[![CI](https://github.com/TU-USUARIO/monitoring-scripts-lab/actions/workflows/ci.yml/badge.svg)]()
+
 Laboratorio sencillo de monitorización para entornos Linux, pensado para demostrar habilidades de **automatización**, **scripting** y **monitorización básica** orientadas a un perfil junior de **Sistemas / DevOps / Cloud**.
 
 El proyecto incluye:
@@ -76,9 +82,14 @@ MONITOR_DISK_PATH=/
 
 ## 5. Uso
 ### 5.1 Ejecución del monitor en Python
+Ejecución estándar (una pasada)
 ```bash
 # Desde la raíz del proyecto
 python -m app.monitor
+```
+Ejecución continua (modo loop)
+```bash
+python -m app.monitor --loop --interval 10
 ```
 - El script ejecuta una pasada de monitorización:
     - Comprueba cada servicio configurado.
@@ -154,16 +165,17 @@ if swap_usage >= 50.0:
 De esta forma el proyecto se mantiene extensible y alineado con buenas prácticas de DevOps: código modular y configuración externa.
 
 ## 8. Mejoras futuras sugeridas
-Algunas extensiones que podrían formar parte de futuras iteraciones:
-- Exportar métricas para Prometheus (ej. exponiendo un endpoint HTTP con prometheus_client) y visualizarlas en Grafana.
-- Alertas vía Telegram / Slack / email, usando webhooks o SMTP.
-- Containerización con Docker:
-    - Imagen ligera que ejecute el monitor.
-    - Montaje de volúmenes para logs.
-- Scheduler interno:
-    - Ejecutar la monitorización en bucle con intervalos configurables.
+Posibles extensiones del proyecto en futuras versiones:
+- Exportación de métricas a Prometheus mediante prometheus_client.
+- Dashboard en Grafana.
+- Alertas externas vía Telegram, Slack, Discord o email.
+- Dockerización del monitor:
+    - Imagen ligera con Python.
+    - Volúmenes montados para logs.
+- Scheduler interno más avanzado (ticks, jitter, backoff).
 - Integración con systemd:
-    - Crear un systemd service y un timer para ejecutar el script.
-- Gestión de multi-host:
-    - Desplegar agente ligero en varios servidores y enviar métricas a un servidor central.
-    - Tests automatizados con pytest y GitHub Actions para CI.
+    - monitor.service
+    - monitor.timer
+- Monitorización multi-host (pequeño agente + servidor central).
+- Suites de tests más completos (pytest + mocks).
+- CI extendida con análisis estático (ruff, black, mypy).
