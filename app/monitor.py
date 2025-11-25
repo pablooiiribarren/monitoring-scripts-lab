@@ -1,5 +1,8 @@
 # app/monitor.py
 from pathlib import Path
+import sys
+import time
+import argparse
 
 from app.config import load_settings
 from app.logger import setup_logging
@@ -38,10 +41,23 @@ def run_once() -> int:
 
     logger.info("=== Inicio de ejecución de monitorización ===")
 
+    # Modo compatibilidad: solo pensado para Linux (systemd + /proc)
+    if not sys.platform.startswith("linux"):
+        logger.warning(
+            "Sistema operativo no Linux detectado. "
+            "Este proyecto está diseñado para Linux (systemd + /proc). "
+            "Se omiten checks de servicios y métricas en modo compatibilidad."
+        )
+        logger.info("=== Fin de ejecución de monitorización (modo compatibilidad) ===")
+        return 0
+
     exit_code = 0
 
     # --- Checks de servicios ---
     for service in settings.services:
+        if not service:
+            continue
+
         try:
             ok = check_service(service)
             if ok:
@@ -65,7 +81,6 @@ def run_once() -> int:
         logger.info("Uso de memoria: %.2f%%", mem_usage)
         logger.info("Uso de disco (%s): %.2f%%", settings.disk_path, disk_usage)
 
-        # Umbrales (simplificados: usamos load avg como proxy de % CPU)
         if cpu_load >= settings.cpu_threshold:
             msg = f"CPU load alto: {cpu_load:.2f} (umbral {settings.cpu_threshold})"
             send_alert(logger, settings.alerts_file, msg)
@@ -93,5 +108,34 @@ def run_once() -> int:
     return exit_code
 
 
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Monitorización básica de servicios y recursos del sistema."
+    )
+    parser.add_argument(
+        "--loop",
+        action="store_true",
+        help="Ejecutar en bucle continuo.",
+    )
+    parser.add_argument(
+        "--interval",
+        type=int,
+        default=60,
+        help="Intervalo en segundos entre ejecuciones en modo --loop (por defecto: 60).",
+    )
+
+    args = parser.parse_args()
+
+    if not args.loop:
+        # Modo normal: una pasada
+        raise SystemExit(run_once())
+
+    # Modo loop: se queda corriendo
+    while True:
+        exit_code = run_once()
+        # Aquí podrías tomar decisiones según exit_code (ej. parar si hay error grave)
+        time.sleep(max(1, args.interval))
+
+
 if __name__ == "__main__":
-    raise SystemExit(run_once())
+    main()
