@@ -4,7 +4,7 @@
 [![Status](https://img.shields.io/badge/Status-Active-success.svg)]()
 [![Linux](https://img.shields.io/badge/Platform-Linux-orange.svg)]()
 [![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)]()
-[![CI](https://github.com/TU-USUARIO/monitoring-scripts-lab/actions/workflows/ci.yml/badge.svg)]()
+[![CI](https://github.com/pablooiiribarren/monitoring-scripts-lab/actions/workflows/ci.yml/badge.svg)]()
 
 Laboratorio sencillo de monitorización para entornos Linux, pensado para demostrar habilidades de **automatización**, **scripting** y **monitorización básica** orientadas a un perfil junior de **Sistemas / DevOps / Cloud**.
 
