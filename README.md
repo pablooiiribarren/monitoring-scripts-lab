@@ -6,62 +6,68 @@
 [![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)]()
 [![CI](https://github.com/pablooiiribarren/monitoring-scripts-lab/actions/workflows/ci.yml/badge.svg)]()
 
-Laboratorio sencillo de monitorización para entornos Linux, pensado para demostrar habilidades de **automatización**, **scripting** y **monitorización básica** orientadas a un perfil junior de **Sistemas / DevOps / Cloud**.
+A lightweight monitoring lab for Linux environments, built to demonstrate 
+**automation**, **scripting** and **basic monitoring** skills for junior 
+**Systems / DevOps / Cloud** profiles.
 
-El proyecto incluye:
+The project includes:
 
-- Script principal en **Python** para checks de servicios y métricas de sistema.
-- Script alternativo en **Bash** para chequeos rápidos de servicios.
-- Configuración mediante **variables de entorno** (`.env`).
-- **Logging profesional** a fichero y consola.
-- Sistema de **alertas simples** basado en logs y fichero dedicado.
+- Main **Python** script for service checks and system metrics
+- Alternative **Bash** script for quick service checks
+- Configuration via **environment variables** (`.env`)
+- **Professional logging** to file and console
+- Simple **alerting system** based on logs and a dedicated alerts file
 
 ---
 
-## 1. Arquitectura del proyecto
+## 1. Project Structure
 
 ```bash
 monitoring-scripts-lab/
 ├─ app/
 │  ├─ __init__.py
-│  ├─ config.py          # Configuración (env/.env)
-│  ├─ logger.py          # Configuración de logging
-│  ├─ checks.py          # Funciones de monitorización
-│  └─ monitor.py         # Script principal (entrypoint)
+│  ├─ config.py          # Configuration (env/.env)
+│  ├─ logger.py          # Logging setup
+│  ├─ checks.py          # Monitoring functions
+│  └─ monitor.py         # Main script (entrypoint)
 ├─ scripts/
-│  └─ quick_service_check.sh   # Script Bash de chequeo rápido
-├─ logs/                 # (se crea en runtime)
-├─ .env.example          # Ejemplo de configuración
-├─ requirements.txt      # Dependencias Python
+│  └─ quick_service_check.sh   # Quick Bash check script
+├─ logs/                 # (created at runtime)
+├─ .env.example          # Configuration example
+├─ requirements.txt      # Python dependencies
 ├─ .gitignore
 └─ README.md
 ```
 
-## 2. Requisitos
-- Sistema operativo: Linux (se asume systemd y /proc disponible).
-- Python 3.9+.
-- Opcional: python3-venv instalado para crear entorno virtual.
+## 2. Requirements
 
-## 3. Instalación
+- OS: Linux (systemd and /proc assumed available)
+- Python 3.9+
+- Optional: python3-venv for virtual environment support
+
+## 3. Installation
+
 ```bash
-# Clonar el repositorio
-git clone https://github.com/tu-usuario/monitoring-scripts-lab.git
+# Clone the repository
+git clone https://github.com/pablooiiribarren/monitoring-scripts-lab.git
 cd monitoring-scripts-lab
 
-# (Opcional) Crear entorno virtual
+# (Optional) Create virtual environment
 python -m venv .venv
 source .venv/bin/activate
 
-# Instalar dependencias
+# Install dependencies
 pip install -r requirements.txt
 
-# Crear fichero .env a partir del ejemplo
+# Create .env file from example
 cp .env.example .env
-# Editar .env con tus servicios y umbrales
+# Edit .env with your services and thresholds
 ```
 
-## 4. Configuración
-El proyecto se configura mediante variables de entorno. Lo más cómodo es usar un fichero .env:
+## 4. Configuration
+
+The project is configured via environment variables. The easiest way is to use a `.env` file:
+
 ```bash
 MONITOR_SERVICES=nginx,ssh,docker
 MONITOR_CPU_THRESHOLD=4.0
@@ -72,111 +78,120 @@ MONITOR_LOG_LEVEL=INFO
 MONITOR_DISK_PATH=/
 # MONITOR_ALERTS_FILE=/var/log/monitoring_alerts.log
 ```
-- MONITOR_SERVICES: lista de servicios gestionados por systemd a monitorizar.
-- MONITOR_CPU_THRESHOLD: umbral de alerta sobre el load average a 1 minuto.
-- MONITOR_MEM_THRESHOLD: umbral de uso de memoria en %.
-- MONITOR_DISK_THRESHOLD: umbral de uso de disco en %.
-- MONITOR_DISK_PATH: punto de montaje a monitorizar (ej: /, /data).
-- MONITOR_LOG_DIR: carpeta donde se guardan los logs.
-- MONITOR_ALERTS_FILE: fichero de alertas (por defecto logs/alerts.log).
 
-## 5. Uso
-### 5.1 Ejecución del monitor en Python
-Ejecución estándar (una pasada)
+| Variable | Description |
+|----------|-------------|
+| `MONITOR_SERVICES` | Comma-separated list of systemd services to monitor |
+| `MONITOR_CPU_THRESHOLD` | Alert threshold for 1-minute load average |
+| `MONITOR_MEM_THRESHOLD` | Memory usage alert threshold (%) |
+| `MONITOR_DISK_THRESHOLD` | Disk usage alert threshold (%) |
+| `MONITOR_DISK_PATH` | Mount point to monitor (e.g. `/`, `/data`) |
+| `MONITOR_LOG_DIR` | Folder where logs are stored |
+| `MONITOR_ALERTS_FILE` | Alerts file (default: `logs/alerts.log`) |
+
+## 5. Usage
+
+### 5.1 Python monitor
+
+Single run:
 ```bash
-# Desde la raíz del proyecto
 python -m app.monitor
 ```
-Ejecución continua (modo loop)
+
+Continuous loop mode:
 ```bash
 python -m app.monitor --loop --interval 10
 ```
-- El script ejecuta una pasada de monitorización:
-    - Comprueba cada servicio configurado.
-    - Lee métricas de CPU (load avg), memoria y disco.
-    - Registra el estado en logs/monitor.log.
-    - Genera alertas si se superan umbrales o un servicio está caído.
 
-Código de salida:
-- 0 → sin alertas.
-- 1 → se ha detectado al menos una alerta o error.
+Each run:
+- Checks every configured service
+- Reads CPU (load avg), memory and disk metrics
+- Logs status to `logs/monitor.log`
+- Generates alerts if thresholds are exceeded or a service is down
 
-Ejemplo de uso en cron (ejecutar cada 5 minutos):
+Exit codes:
+- `0` → no alerts
+- `1` → at least one alert or error detected
+
+Cron example (every 5 minutes):
 ```bash
-*/5 * * * * cd /ruta/a/monitoring-scripts-lab && .venv/bin/python -m app.monitor >> /var/log/monitoring-cron.log 2>&1
+*/5 * * * * cd /path/to/monitoring-scripts-lab && .venv/bin/python -m app.monitor >> /var/log/monitoring-cron.log 2>&1
 ```
-### 5.2 Script rápido en Bash
+
+### 5.2 Quick Bash check
+
 ```bash
-# Chequeo rápido de servicios por defecto
+# Default services
 ./scripts/quick_service_check.sh
 
-# Chequeo rápido de servicios personalizados
+# Custom services
 ./scripts/quick_service_check.sh nginx ssh docker
 ```
 
-## 6. Ejemplos de salida
-### 6.1 Log de monitorización (logs/monitor.log)
+## 6. Output examples
+
+### Monitor log (`logs/monitor.log`)
 ```bash
-2025-01-01 10:00:00 | INFO | === Inicio de ejecución de monitorización ===
-2025-01-01 10:00:00 | INFO | Servicio 'nginx' activo.
-2025-01-01 10:00:00 | WARNING | [ALERT] Servicio 'docker' NO está activo.
-2025-01-01 10:00:00 | INFO | CPU load (1m): 0.42
-2025-01-01 10:00:00 | INFO | Uso de memoria: 63.21%
-2025-01-01 10:00:00 | INFO | Uso de disco (/): 71.34%
-2025-01-01 10:00:00 | INFO | === Fin de ejecución de monitorización ===
+2025-01-01 10:00:00 | INFO    | === Monitoring run started ===
+2025-01-01 10:00:00 | INFO    | Service 'nginx' is active.
+2025-01-01 10:00:00 | WARNING | [ALERT] Service 'docker' is NOT active.
+2025-01-01 10:00:00 | INFO    | CPU load (1m): 0.42
+2025-01-01 10:00:00 | INFO    | Memory usage: 63.21%
+2025-01-01 10:00:00 | INFO    | Disk usage (/): 71.34%
+2025-01-01 10:00:00 | INFO    | === Monitoring run finished ===
 ```
 
-### 6.2 Fichero de alertas (logs/alerts.log)
+### Alerts file (`logs/alerts.log`)
 ```bash
-Servicio 'docker' NO está activo.
-Uso de disco alto en /data: 92.15% (umbral 90.0%)
+Service 'docker' is NOT active.
+High disk usage on /data: 92.15% (threshold 90.0%)
 ```
 
-### 6.3 Script Bash
+### Bash script output
 ```bash
-$ ./scripts/quick_service_check.sh nginx ssh docker
-Chequeo rápido de servicios: nginx ssh docker
------------------------------------
-[OK]   nginx está activo
-[OK]   ssh está activo
-[FAIL] docker NO está activo
+Quick service check: nginx ssh docker
+[OK]   nginx is active
+[OK]   ssh is active
+[FAIL] docker is NOT active
 ```
 
-## 7. Cómo añadir nuevos checks
-Los checks de sistema viven en app/checks.py. Para añadir un nuevo check:
-- Crear una nueva función en checks.py, por ejemplo:
-```bash
+## 7. Adding new checks
+
+All system checks live in `app/checks.py`. To add a new one:
+
+1. Create a new function in `checks.py`:
+```python
 def read_swap_usage_percent() -> float:
-    # Leer /proc/meminfo y calcular % de uso de swap
+    # Read /proc/meminfo and calculate swap usage %
     ...
 ```
-- Importar la función en app/monitor.py:
-```bash
+
+2. Import it in `app/monitor.py`:
+```python
 from app.checks import read_swap_usage_percent
 ```
-- Integrar la llamada en run_once() y añadir la lógica de alerta:
-```bash
+
+3. Call it inside `run_once()` and add alert logic:
+```python
 swap_usage = read_swap_usage_percent()
-logger.info("Uso de swap: %.2f%%", swap_usage)
+logger.info("Swap usage: %.2f%%", swap_usage)
 
 if swap_usage >= 50.0:
-    msg = f"Uso de swap alto: {swap_usage:.2f}% (umbral 50%)"
+    msg = f"High swap usage: {swap_usage:.2f}% (threshold 50%)"
     send_alert(logger, settings.alerts_file, msg)
 ```
-De esta forma el proyecto se mantiene extensible y alineado con buenas prácticas de DevOps: código modular y configuración externa.
 
-## 8. Mejoras futuras sugeridas
-Posibles extensiones del proyecto en futuras versiones:
-- Exportación de métricas a Prometheus mediante prometheus_client.
-- Dashboard en Grafana.
-- Alertas externas vía Telegram, Slack, Discord o email.
-- Dockerización del monitor:
-    - Imagen ligera con Python.
-    - Volúmenes montados para logs.
-- Scheduler interno más avanzado (ticks, jitter, backoff).
-- Integración con systemd:
-    - monitor.service
-    - monitor.timer
-- Monitorización multi-host (pequeño agente + servidor central).
-- Suites de tests más completos (pytest + mocks).
-- CI extendida con análisis estático (ruff, black, mypy).
+The project stays extensible and aligned with DevOps good practices: 
+modular code and external configuration.
+
+## 8. Planned improvements
+
+- Metrics export to Prometheus via `prometheus_client`
+- Grafana dashboard
+- External alerts via Telegram, Slack, Discord or email
+- Dockerisation (lightweight Python image + mounted log volumes)
+- Advanced internal scheduler (ticks, jitter, backoff)
+- systemd integration (`monitor.service` + `monitor.timer`)
+- Multi-host monitoring (agent + central server)
+- Extended test suite (pytest + mocks)
+- Extended CI with static analysis (ruff, black, mypy)
