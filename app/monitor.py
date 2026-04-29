@@ -17,9 +17,9 @@ from app.checks import (
 
 def send_alert(logger, alerts_file: Path, message: str) -> None:
     """
-    Envía una alerta simple:
-    - Log a nivel WARNING
-    - Append al fichero de alertas
+    Send a simple alert: 
+    - Log at WARNING level 
+    - Append to the alerts file
     """
     logger.warning("[ALERT] %s", message)
 
@@ -28,13 +28,13 @@ def send_alert(logger, alerts_file: Path, message: str) -> None:
         with alerts_file.open("a", encoding="utf-8") as f:
             f.write(message + "\n")
     except Exception as exc:  # noqa: BLE001
-        logger.error("No se pudo escribir en el fichero de alertas: %r", exc)
+        logger.error("Could not write to alert file: %r", exc)
 
 
 def run_once() -> int:
     """
-    Ejecuta una pasada de monitorización.
-    Devuelve 0 si todo OK, 1 si hubo alguna alerta o error.
+    Run a monitoring pass. 
+    Returns 0 if everything OK, 1 if there were any alerts or errors.
     """
     settings = load_settings()
     logger = setup_logging(settings.log_dir, settings.log_level)
@@ -44,11 +44,11 @@ def run_once() -> int:
     # Modo compatibilidad: solo pensado para Linux (systemd + /proc)
     if not sys.platform.startswith("linux"):
         logger.warning(
-            "Sistema operativo no Linux detectado. "
-            "Este proyecto está diseñado para Linux (systemd + /proc). "
-            "Se omiten checks de servicios y métricas en modo compatibilidad."
+            "Non-Linux operating system detected." 
+            "This project is designed for Linux (systemd + /proc)." 
+            "Service and metrics checks are omitted in compatibility mode."
         )
-        logger.info("=== Fin de ejecución de monitorización (modo compatibilidad) ===")
+        logger.info("=== End of monitoring run (compatibility mode) ===")
         return 0
 
     exit_code = 0
@@ -61,13 +61,13 @@ def run_once() -> int:
         try:
             ok = check_service(service)
             if ok:
-                logger.info("Servicio '%s' activo.", service)
+                logger.info("Service '%s' active.", service)
             else:
-                msg = f"Servicio '{service}' NO está activo."
+                msg = f"Service '{service}' is NOT active."
                 send_alert(logger, settings.alerts_file, msg)
                 exit_code = 1
         except MonitoringError as exc:
-            msg = f"Error al comprobar servicio '{service}': {exc}"
+            msg = f"Error checking service '{service}': {exc}"
             send_alert(logger, settings.alerts_file, msg)
             exit_code = 1
 
@@ -78,50 +78,50 @@ def run_once() -> int:
         disk_usage = read_disk_usage_percent(settings.disk_path)
 
         logger.info("CPU load (1m): %.2f", cpu_load)
-        logger.info("Uso de memoria: %.2f%%", mem_usage)
-        logger.info("Uso de disco (%s): %.2f%%", settings.disk_path, disk_usage)
+        logger.info("Memory usage: %.2f%%", mem_usage)
+        logger.info("Disk usage (%s): %.2f%%", settings.disk_path, disk_usage)
 
         if cpu_load >= settings.cpu_threshold:
-            msg = f"CPU load alto: {cpu_load:.2f} (umbral {settings.cpu_threshold})"
+            msg = f"CPU load high: {cpu_load:.2f} (threshold {settings.cpu_threshold})"
             send_alert(logger, settings.alerts_file, msg)
             exit_code = 1
 
         if mem_usage >= settings.mem_threshold:
-            msg = f"Uso de memoria alto: {mem_usage:.2f}% (umbral {settings.mem_threshold}%)"
+            msg = f"Memory usage high: {mem_usage:.2f}% (threshold {settings.mem_threshold}%)"
             send_alert(logger, settings.alerts_file, msg)
             exit_code = 1
 
         if disk_usage >= settings.disk_threshold:
             msg = (
-                f"Uso de disco alto en {settings.disk_path}: "
-                f"{disk_usage:.2f}% (umbral {settings.disk_threshold}%)"
+                f"High disk usage {settings.disk_path}: "
+                f"{disk_usage:.2f}% (threshold {settings.disk_threshold}%)"
             )
             send_alert(logger, settings.alerts_file, msg)
             exit_code = 1
 
     except MonitoringError as exc:
-        msg = f"Error al leer métricas de sistema: {exc}"
+        msg = f"Error reading system metrics: {exc}"
         send_alert(logger, settings.alerts_file, msg)
         exit_code = 1
 
-    logger.info("=== Fin de ejecución de monitorización ===")
+    logger.info("=== End of monitoring run ===")
     return exit_code
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Monitorización básica de servicios y recursos del sistema."
+        description="Basic monitoring of services and system resources."
     )
     parser.add_argument(
         "--loop",
         action="store_true",
-        help="Ejecutar en bucle continuo.",
+        help="Run in continuous loop.",
     )
     parser.add_argument(
         "--interval",
         type=int,
         default=60,
-        help="Intervalo en segundos entre ejecuciones en modo --loop (por defecto: 60).",
+        help="Interval in seconds between executions in --loop mode (default: 60).",
     )
 
     args = parser.parse_args()
