@@ -8,17 +8,17 @@ set -euo pipefail
 SERVICES="${*:-nginx ssh docker}"
 
 if ! command -v systemctl >/dev/null 2>&1; then
-  echo "ERROR: systemctl no está disponible en este sistema." >&2
+  echo "ERROR: systemctl is not available on this system." >&2
   exit 1
 fi
 
-echo "Chequeo rápido de servicios: $SERVICES"
+echo "Quick service check: $SERVICES"
 echo "-----------------------------------"
 
 for svc in $SERVICES; do
   if systemctl is-active --quiet "$svc"; then
-    echo "[OK]   $svc está activo"
+    echo "[OK]   $svc is active"
   else
-    echo "[FAIL] $svc NO está activo"
+    echo "[FAIL] $svc is NOT active"
   fi
 done
