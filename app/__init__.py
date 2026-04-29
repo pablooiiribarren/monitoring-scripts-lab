@@ -1,6 +1,6 @@
 # app/__init__.py
 """
-Paquete principal del laboratorio de monitorización.
+Monitoring Laboratory Main Package.
 
-Mantiene el código organizado y reutilizable.
+Keeps code organized and reusable.
 """
